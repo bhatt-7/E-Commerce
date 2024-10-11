@@ -1,15 +1,16 @@
 const express = require("express");
 const app = express();
-const {db} = require("./config/db");
+const { db } = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const productRoutes = require("./routes/productRoutes");
 const cors = require("cors");
 app.use(cors({
-    origin: 'http://localhost:3000', 
-    credentials: true 
+    origin: 'http://localhost:3000',
+    credentials: true
 }));
 app.use(express.json());
 app.use('/api/users', userRoutes);
-
+app.use('/api/products', productRoutes);
 
 
 app.get('/', (req, res) => {
