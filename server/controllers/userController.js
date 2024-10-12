@@ -4,7 +4,7 @@ const otpStore = new Map();
 const User = require('../models/userSchema');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'secret_key';
+const JWT_SECRET = 'hello123';
 const JWT_EXPIRES_IN = '1h';
 
 const transporter = nodemailer.createTransport({
@@ -133,11 +133,13 @@ exports.login = async (req, res) => {
         //set token in cookie
         res.cookie('token', token, {
             httpOnly: true,
-            sameSite: 'none',
-            secure: false,
-        });
+            sameSite: 'None',
+            secure: true,
+            maxAge: 2 * 60 * 60 * 1000
+        })
 
-        res.status(200).json({ message: "User logged in successfully", token });
+        res.status(200).json({ message: "Login successful", token });
+
 
     } catch (error) {
         console.error("Error logging in:", error);

@@ -47,10 +47,11 @@ const Navbar = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
     localStorage.setItem('isLoggedIn', 'false'); // Update login status
-
+    //clear cookie on logout
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     // Manually update the state
     setIsLoggedIn(false);
-    window.dispatchEvent(new Event("storage")); // Dispatch storage event for the same tab
+    window.dispatchEvent(new Event("storage")); 
     navigate('/');
   };
 

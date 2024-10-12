@@ -2,11 +2,12 @@
 const express = require('express');
 const router = express.Router();
 const { createProduct, getAllProducts } = require('../controllers/productController');
+const { authenticateToken } = require('../middlewares/auth');  // Import middleware
 
-// Route to create a new product
-router.post('/create', createProduct);
+// Protect the product creation route
+router.post('/create', authenticateToken, createProduct);
 
-// Route to fetch all products
+// Fetch all products route (no authentication required)
 router.get('/all', getAllProducts);
 
 module.exports = router;

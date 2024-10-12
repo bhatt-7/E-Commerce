@@ -17,34 +17,36 @@ function Login() {
     };
 
     // Handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+    // Handle form submission in the Login component
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-        try {
-            const response = await axios.post('http://localhost:5000/api/users/login', {
-                email,
-                password
-            }, {
-                withCredentials: true
-            });
+    try {
+        const response = await axios.post('http://localhost:5000/api/users/login', {
+            email,
+            password
+        }, {
+            withCredentials: true // Include the cookie in the request
+        });
 
-            if (response.status === 200) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('email', email);
-                localStorage.setItem('isLoggedIn', 'true');
-                window.dispatchEvent(new Event("storage"));
-                navigate('/dashboard');
-            } else {
-                setError('Invalid credentials');
-            }
-        } catch (err) {
-            setError(err.response?.data?.message || 'Error logging in. Please try again.');
-        } finally {
-            setLoading(false);
+        if (response.status === 200) {
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('email', email);
+            localStorage.setItem('isLoggedIn', 'true');
+            window.dispatchEvent(new Event("storage"));
+            navigate('/dashboard');
+        } else {
+            setError('Invalid credentials');
         }
-    };
+    } catch (err) {
+        setError(err.response?.data?.message || 'Error logging in. Please try again.');
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     return (
         <div className="flex justify-center items-center h-screen bg-gray-100">

@@ -5,7 +5,8 @@ import Product from "../components/Product";
 const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
-
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [error, setError] = useState("");
     async function fetchProducts() {
         setLoading(true);
         try {
