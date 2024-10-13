@@ -14,6 +14,9 @@ function SignUp() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -22,6 +25,11 @@ function SignUp() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!passwordRegex.test(formData.password)) {
+            setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+            return;
+        }
 
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');

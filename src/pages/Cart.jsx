@@ -52,7 +52,7 @@ const Cart = () => {
               </div>
 
               <div className="text-gray-700 font-semibold text-lg text-left  w-40 mt-1">
-                <p >Total Amount: ${totalAmount}</p>
+                <p >Total Amount: ₹{totalAmount}</p>
                 <button className="bg-yellow-500 p-3 rounded-xl w-[300px] hover:bg-yellow-600 transition duration-300 ease-in text-white ">
                   CheckOut Now
                 </button>
