@@ -9,6 +9,7 @@ dotenv.config();
 
 const JWT_SECRET = 'hello123';
 const JWT_EXPIRES_IN = '1h';
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -86,8 +87,15 @@ exports.verifyOtp = async (req, res) => {
             return res.status(400).json({ message: "Password is required" });
         }
 
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+            });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        //use regex to make password validation
 
         const user = new User({ name, email, password: hashedPassword });
         user.isVerified = true;
@@ -184,7 +192,7 @@ exports.login = async (req, res) => {
             secure: process.env.NODE_ENV === 'production',
             maxAge: 2 * 60 * 60 * 1000
         });
-        
+
         res.status(200).json({ message: "Login successful", token, role: user.role });
     } catch (error) {
         console.error("Error logging in:", error);
