@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 const otpStore = new Map();
 const User = require('../models/userSchema');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 const JWT_SECRET = 'hello123';
 const JWT_EXPIRES_IN = '1h';
@@ -99,8 +102,55 @@ exports.verifyOtp = async (req, res) => {
     }
 };
 
+// exports.login = async (req, res) => {
+//     console.log("req.body", req.body);
+//     try {
+//         const { email, password } = req.body;
+
+//         if (!email || !password) {
+//             return res.status(400).json({ message: "Email and password are required" });
+//         }
+
+//         // Find the user by email
+//         const user = await User.findOne({ email });
+//         console.log(user);
+//         if (!user) {
+//             return res.status(400).json({ message: "User not found" });
+//         }
+
+//         // Check if the password matches
+//         const isMatch = await bcrypt.compare(password, user.password);
+//         if (!isMatch) {
+//             return res.status(400).json({ message: "Invalid credentials" });
+//         }
+
+//         // Create a payload with user data (you can include more fields if needed)
+//         const payload = {
+//             id: user._id,
+//             email: user.email,
+//             name: user.name // Assuming the user schema has a name field
+//         };
+
+//         // Generate a JWT token
+//         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+//         //set token in cookie
+//         res.cookie('token', token, {
+//             httpOnly: true,
+//             sameSite: 'None',
+//             secure: true,
+//             maxAge: 2 * 60 * 60 * 1000
+//         })
+
+//         res.status(200).json({ message: "Login successful", token });
+
+
+//     } catch (error) {
+//         console.error("Error logging in:", error);
+//         return res.status(500).json({ message: "Error logging in", error: error.message });
+//     }
+// };
+
 exports.login = async (req, res) => {
-    console.log("req.body", req.body);
     try {
         const { email, password } = req.body;
 
@@ -108,41 +158,46 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
-        // Find the user by email
         const user = await User.findOne({ email });
-        console.log(user);
         if (!user) {
             return res.status(400).json({ message: "User not found" });
         }
 
-        // Check if the password matches
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        // Create a payload with user data (you can include more fields if needed)
+        // Add the user's role to the JWT payload
         const payload = {
             id: user._id,
             email: user.email,
-            name: user.name // Assuming the user schema has a name field
+            name: user.name,
+            role: user.role  // Ensure role is saved in the user schema
         };
 
-        // Generate a JWT token
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-        //set token in cookie
+
         res.cookie('token', token, {
-            httpOnly: true,
+            httpOnly: false,
             sameSite: 'None',
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
             maxAge: 2 * 60 * 60 * 1000
-        })
-
-        res.status(200).json({ message: "Login successful", token });
-
-
+        });
+        
+        res.status(200).json({ message: "Login successful", token, role: user.role });
     } catch (error) {
         console.error("Error logging in:", error);
         return res.status(500).json({ message: "Error logging in", error: error.message });
+    }
+};
+
+exports.logout = async (req, res) => {
+    try {
+        res.clearCookie('token');
+        res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        console.error("Error logging out:", error);
+        return res.status(500).json({ message: "Error logging out", error: error.message });
     }
 };

@@ -2,6 +2,7 @@ import { FaShoppingCart } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const Navbar = () => {
   const { cart } = useSelector((state) => state);
@@ -46,12 +47,22 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
+    localStorage.removeItem('role');
     localStorage.setItem('isLoggedIn', 'false'); // Update login status
     //clear cookie on logout
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     // Manually update the state
     setIsLoggedIn(false);
     window.dispatchEvent(new Event("storage")); 
+    const response = axios.post('http://localhost:5000/api/users/logout', {
+      withCredentials: true
+    })
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
     navigate('/');
   };
 

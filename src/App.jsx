@@ -8,6 +8,7 @@ import SignUp from "./pages/SignUp"
 import VerifyOtp from "./pages/VerifyOtp"
 import Dashboard from "./pages/Dashboard";
 import AddProduct from "./components/AddProduct";
+import AdminDashboard from "./pages/AdminDashboard";
 const App = () => {
   return (<div>
     <div className="bg-black">
@@ -16,6 +17,7 @@ const App = () => {
     <Routes>
       <Route path="/dashboard" element={<Dashboard />} index />
       <Route path="/" element={<Home />} />
+      <Route path='/admin-dashboard' element={<AdminDashboard/>} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />

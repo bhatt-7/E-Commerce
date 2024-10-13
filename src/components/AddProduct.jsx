@@ -18,7 +18,9 @@ const AddProduct = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/api/products/create', productData);
+            const response = await axios.post('http://localhost:5000/api/products/create', productData,{
+                withCredentials: true
+            });
             if (response.status === 201) {
                 toast.success("Product added successfully!");
                 setProductData({
