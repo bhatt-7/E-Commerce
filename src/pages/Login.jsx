@@ -97,6 +97,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link, NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -134,11 +135,11 @@ function Login() {
                 localStorage.setItem('isLoggedIn', 'true');
                 window.dispatchEvent(new Event("storage"));
 
-                
+
                 if (role === 'admin') {
-                    navigate('/admin-dashboard');  
+                    navigate('/admin-dashboard');
                 } else {
-                    navigate('/dashboard');  
+                    navigate('/dashboard');
                 }
             } else {
                 setError('Invalid credentials');
@@ -178,6 +179,9 @@ function Login() {
                             required
                         />
                     </div>
+                    <p className="text-blue-500 text-center mt-4">
+                        <NavLink to="/forgot-password">Forgot Password?</NavLink>
+                    </p>
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 

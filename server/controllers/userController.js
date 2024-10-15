@@ -8,7 +8,7 @@ dotenv.config();
 
 
 const JWT_SECRET = 'hello123';
-const JWT_EXPIRES_IN = '1h';
+const JWT_EXPIRES_IN = '24h';
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
 const transporter = nodemailer.createTransport({
@@ -190,7 +190,7 @@ exports.login = async (req, res) => {
             httpOnly: false,
             sameSite: 'None',
             secure: process.env.NODE_ENV === 'production',
-            maxAge: 2 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000
         });
 
         res.status(200).json({ message: "Login successful", token, role: user.role });
@@ -207,5 +207,68 @@ exports.logout = async (req, res) => {
     } catch (error) {
         console.error("Error logging out:", error);
         return res.status(500).json({ message: "Error logging out", error: error.message });
+    }
+};
+
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Generate a reset token
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // Create a transporter
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'projectera678@gmail.com',
+                pass: 'fftf nlqv nrbz xtng'
+            },
+        });
+
+        // Send email with reset link
+        const resetLink = `http://localhost:3000/reset-password/${token}`;
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: 'Password Reset',
+            html: `<p>Click <a href="${resetLink}">here</a> to reset your password</p>`,
+        });
+
+        res.status(200).json({ message: 'Password reset link sent to your email' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error sending email' });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+    if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+            message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+        });
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Invalid token' });
+        }
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(password, salt);
+        await user.save();
+        console.log(password)
+
+        res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error resetting password' });
     }
 };

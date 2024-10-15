@@ -3,6 +3,7 @@ const app = express();
 const { db } = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 app.use(cors({
@@ -13,7 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
-
+app.use('/api/carts', cartRoutes)
 
 app.get('/', (req, res) => {
     res.send("Hello World");
