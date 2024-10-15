@@ -3,7 +3,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import Spinner from "../components/Spinner";
 import Product from "../components/Product";
 import AdminProduct from '../components/AdminProduct';
-function AdminDashboard() {
+import axios from 'axios';
+function AdminProducts() {
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -37,13 +38,23 @@ function AdminDashboard() {
     }
 
     // Handle Logout
-    const handleLogout = () => {
+    const handleLogout = async () => {
         localStorage.removeItem('token');
         localStorage.removeItem('email');
         localStorage.removeItem('role');
-        localStorage.setItem('isLoggedIn', 'false');
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        navigate('/');  // Redirect to login page after logout
+        localStorage.setItem('isLoggedIn', 'false'); // Update login status
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'; // Clear cookies
+
+        // Manually trigger storage event to sync across components
+        window.dispatchEvent(new Event("storage"));
+
+        try {
+            await axios.post('http://localhost:5000/api/users/logout', { withCredentials: true });
+        } catch (error) {
+            console.log(error);
+        }
+
+        navigate('/');
     };
 
     const removeProductFromList = (productId) => {
@@ -92,4 +103,4 @@ function AdminDashboard() {
     );
 }
 
-export default AdminDashboard;
+export default AdminProducts;

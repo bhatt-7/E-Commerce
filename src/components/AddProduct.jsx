@@ -37,9 +37,9 @@ const AddProduct = () => {
                 toast.error("Error adding product");
             }
         } catch (error) {
-            
+
         }
-        
+
 
     };
 
