@@ -1,10 +1,10 @@
-const jwt = require('jsonwebtoken'); 
-const secretKey = process.env.JWT_SECRET; 
+const jwt = require('jsonwebtoken');
+const secretKey = process.env.JWT_SECRET;
 
 exports.authenticateToken = async (req, res, next) => {
     try {
-        
-        const token = req.cookies.token; 
+
+        const token = req.cookies.token;
 
         console.log("Extracted token:", token);
 
@@ -14,16 +14,16 @@ exports.authenticateToken = async (req, res, next) => {
 
         try {
             const decoded = jwt.verify(token, secretKey);
-            req.user = decoded; 
+            req.user = decoded;
             console.log("Decoded token:", req.user);
         } catch (err) {
-            console.error("Token verification error:", err); 
+            console.error("Token verification error:", err);
             return res.status(401).json({ success: false, message: 'Token is invalid' });
         }
 
-        next(); 
+        next();
     } catch (error) {
-        console.error("Error in authentication middleware:", error); 
+        console.error("Error in authentication middleware:", error);
         return res.status(500).json({ success: false, message: 'Something went wrong while validating the token' });
     }
 };

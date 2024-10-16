@@ -185,7 +185,7 @@ const Cart = () => {
     const fetchCartItems = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/carts/cart', { withCredentials: true });
-        console.log("Response data:", response.data);
+        console.log("Response data:", response.data.cartItems);
         setCartItems(response.data.cartItems);
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -211,13 +211,74 @@ const Cart = () => {
     setCartItems((prevItems) => prevItems.filter((item) => item._id !== id));
   };
 
+  const checkOutHandler = async () => {
+    try {
+      const productsInCart = cartItems.map(item => ({
+        productId: item.product._id,
+        quantity: item.quantity,
+      }));
+
+      const { data: { orderId, order } } = await axios.post('http://localhost:5000/api/payments/create-order', {
+        amount: totalAmount,
+        currency: "INR",
+        products: productsInCart
+      }, { withCredentials: true });
+
+      const options = {
+        key: "rzp_test_5XhKGpSXFOwnLs",
+        amount: order.amount,
+        currency: order.currency,
+        name: "CQ-Store",
+        description: "Payment for cart items",
+        order_id: order.id,
+        handler: async (response) => {
+          try {
+            const verifyUrl = `http://localhost:5000/api/payments/verify-payment`;
+            const verifyResponse = await axios.post(verifyUrl, {
+              order_id: orderId,
+              payment_id: response.razorpay_payment_id,
+              signature: response.razorpay_signature
+            });
+
+            if (verifyResponse.data.success) {
+              toast.success("Payment Successful");
+              setCartItems([]);
+              const response = await axios.put("http://localhost:5000/api/carts/remove-all", {}, { withCredentials: true });
+              if (response.data.status === 200) {
+                navigate("/success");
+              }
+            } else {
+              toast.error("Payment verification failed");
+            }
+          } catch (error) {
+            toast.error("Error verifying payment");
+          }
+        },
+        prefill: {
+          name: "Ayush",
+          email: "ayushbhatt@gmail.com",
+          contact: "9999999990",
+        },
+        theme: {
+          color: "#528FF0",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      toast.error("Error during checkout");
+    }
+  };
+
+
   return (
     <div className="flex justify-center content-center">
       {cartItems?.length > 0 ? (
         <div className="flex flex-col-reverse sm:flex-row justify-center content-center m-3 gap-10">
           <div>
             {cartItems.map((item) => (
-              <CartItem key={item._id} item={item} onRemove={handleRemoveItem} />  
+              <CartItem key={item._id} item={item} onRemove={handleRemoveItem} />
             ))}
           </div>
 
@@ -232,7 +293,7 @@ const Cart = () => {
 
             <div className="text-gray-700 font-semibold text-lg text-left w-40 mt-1">
               <p>Total Amount: ₹{totalAmount}</p>
-              <button className="bg-yellow-500 p-3 rounded-xl w-[300px] hover:bg-yellow-600 transition duration-300 ease-in text-white">
+              <button onClick={checkOutHandler} className="bg-yellow-500 p-3 rounded-xl w-[300px] hover:bg-yellow-600 transition duration-300 ease-in text-white">
                 CheckOut Now
               </button>
             </div>

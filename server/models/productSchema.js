@@ -17,9 +17,9 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    userId: { 
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true 
+        required: true
     },
     isDeleted: {
         type: Boolean,

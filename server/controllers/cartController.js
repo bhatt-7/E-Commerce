@@ -5,9 +5,9 @@ const User = require('../models/userSchema');
 
 exports.addToCart = async (req, res) => {
     const { productId } = req.body;
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
-    console.log("userId and productId:", userId, productId); 
+    console.log("userId and productId:", userId, productId);
 
     try {
         if (!productId) {
@@ -19,14 +19,14 @@ exports.addToCart = async (req, res) => {
         if (cart) {
             const itemIndex = cart.products.findIndex(p => p.product == productId);
             if (itemIndex > -1) {
-                cart.products[itemIndex].quantity += 1; 
+                cart.products[itemIndex].quantity += 1;
             } else {
                 cart.products.push({ product: productId, quantity: 1 });
             }
         } else {
             cart = new Cart({
                 user: userId,
-                products: [{ product: productId, quantity: 1 }] 
+                products: [{ product: productId, quantity: 1 }]
             });
         }
 
@@ -85,8 +85,8 @@ exports.deleteFromCart = async (req, res) => {
 
         const updatedCart = await Cart.findOneAndUpdate(
             { user: userId },
-            { $pull: { products: { _id: productId } } }, 
-            { new: true } 
+            { $pull: { products: { _id: productId } } },
+            { new: true }
         ).populate('products.product');
         console.log(updatedCart);
         if (!updatedCart) {
@@ -99,3 +99,23 @@ exports.deleteFromCart = async (req, res) => {
         res.status(500).json({ message: 'Failed to remove product from cart', error: error.message });
     }
 };
+
+exports.formatCart = async (req, res) => {
+    const userId = req.user.id;
+    //delete that user's cart
+    console.log("entered Format")
+    console.log('userId:', userId);
+    try {
+        //delete cart of that user
+        const deletedCart = await Cart.findOneAndDelete({ user: userId });
+        if (!deletedCart) {
+            return res.status(404).json({ message: 'Cart not found' });
+        }
+        res.status(200).json({ message: 'Cart deleted successfully' });
+
+    } catch (error) {
+        console.error('Error deleting cart:', error);
+        res.status(500).json({ message: 'Failed to delete cart', error: error.message });
+    }
+
+}
