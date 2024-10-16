@@ -1,10 +1,10 @@
-const jwt = require('jsonwebtoken'); // Ensure you have jwt imported
-const secretKey = process.env.JWT_SECRET; // Make sure this is defined in your environment
+const jwt = require('jsonwebtoken'); 
+const secretKey = process.env.JWT_SECRET; 
 
 exports.authenticateToken = async (req, res, next) => {
     try {
-        // Get the token from cookies
-        const token = req.cookies.token; // Since httpOnly is false, you can access it directly
+        
+        const token = req.cookies.token; 
 
         console.log("Extracted token:", token);
 
@@ -13,18 +13,17 @@ exports.authenticateToken = async (req, res, next) => {
         }
 
         try {
-            // Verify the token
             const decoded = jwt.verify(token, secretKey);
-            req.user = decoded; // Store the user data in the request object for further use
-            console.log("Decoded token:", req.user); // Log the decoded user data
+            req.user = decoded; 
+            console.log("Decoded token:", req.user);
         } catch (err) {
-            console.error("Token verification error:", err); // Log the error for debugging
+            console.error("Token verification error:", err); 
             return res.status(401).json({ success: false, message: 'Token is invalid' });
         }
 
-        next(); // Proceed to the next middleware or route handler
+        next(); 
     } catch (error) {
-        console.error("Error in authentication middleware:", error); // Log any unexpected error
+        console.error("Error in authentication middleware:", error); 
         return res.status(500).json({ success: false, message: 'Something went wrong while validating the token' });
     }
 };

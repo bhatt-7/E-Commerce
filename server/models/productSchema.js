@@ -16,6 +16,14 @@ const productSchema = new mongoose.Schema({
     image: {
         type: String,
         required: true
+    },
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId,
+        required: true 
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 });
 

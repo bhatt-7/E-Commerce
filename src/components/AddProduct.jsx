@@ -43,13 +43,21 @@ const AddProduct = () => {
 
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         localStorage.removeItem('token');
         localStorage.removeItem('email');
         localStorage.removeItem('role');
-        localStorage.setItem('isLoggedIn', 'false');
+        localStorage.setItem('isLoggedIn', 'false'); // Update login status
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        navigate('/');  // Redirect to login page after logout
+        window.dispatchEvent(new Event("storage"));
+
+        try {
+            await axios.post('http://localhost:5000/api/users/logout', { withCredentials: true });
+        } catch (error) {
+            console.log(error);
+        }
+
+        navigate('/');
     };
 
     return (

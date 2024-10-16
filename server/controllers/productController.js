@@ -1,18 +1,19 @@
-// controllers/productController.js
 const Product = require('../models/productSchema');
 
-// Controller to create a new product
 const createProduct = async (req, res) => {
     try {
         const { title, description, price, image } = req.body;
+        const userId = req.user.id;
+        console.log("creater Id:", userId);
 
         const newProduct = new Product({
             title,
             description,
             price,
-            image
+            image,
+            userId
         });
-        console.log(newProduct);
+        console.log("newProduct", newProduct);
         await newProduct.save();
         res.status(201).json({ message: 'Product created successfully', product: newProduct });
     } catch (error) {
@@ -21,10 +22,9 @@ const createProduct = async (req, res) => {
     }
 };
 
-// Controller to fetch all products
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find({ isDeleted: false });
         res.status(200).json(products);
     } catch (error) {
         console.error("Error fetching products:", error);
@@ -35,9 +35,8 @@ const deleteProduct = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Find the product by its ID and delete it
-        const deletedProduct = await Product.findByIdAndDelete(id);
 
+        const deletedProduct = await Product.findByIdAndUpdate(id, { isDeleted: true }, { new: true })
         if (!deletedProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
@@ -56,7 +55,7 @@ const updateProduct = async (req, res) => {
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
             { title, description, price, image },
-            { new: true } // Return the updated document
+            { new: true }
         );
 
         if (!updatedProduct) {
@@ -70,9 +69,26 @@ const updateProduct = async (req, res) => {
     }
 };
 
+const getProductsForAuthenticatedUser = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const products = await Product.find({ userId: userId, isDeleted: false });
+
+        if (products.length === 0) {
+            return res.status(404).json({ message: 'No products found for this user' });
+        }
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching user's products:", error);
+        res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+    }
+};
+
 module.exports = {
     createProduct,
     getAllProducts,
     deleteProduct,
-    updateProduct
+    updateProduct,
+    getProductsForAuthenticatedUser
 };

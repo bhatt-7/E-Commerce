@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 function VerifyOtp() {
     const [otp, setOtp] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
 
-    // Handle OTP input change
     const handleChange = (e) => {
         setOtp(e.target.value);
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -23,41 +21,40 @@ function VerifyOtp() {
 
         try {
             const userData = JSON.parse(localStorage.getItem('userData'));
-
+            console.log("User data:", userData);
             if (!userData) {
                 setError('No user data found. Please register again.');
                 setLoading(false);
                 return;
             }
 
-            const { email, password, name } = userData;
-
+            const { email, password, name, isAdmin } = userData;
+            const role = isAdmin ? 'admin' : 'user';
             const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
                 email,
                 otp,
                 password,
-                name
+                name,
+                isAdmin,
+                role
             });
 
             if (response.status === 200) {
                 setSuccess('OTP verified successfully! User registered.');
-                localStorage.removeItem('userData'); // Clear stored user data
-
-                // Redirect to login after successful verification
+                localStorage.removeItem('userData');
                 setTimeout(() => {
-                    navigate('/login'); // Redirect to login page
-                }, 2000); // Delay for user feedback
+                    navigate('/login'); 
+                }, 2000); 
             } else {
                 setError('Invalid OTP or request failed');
             }
         } catch (error) {
-            // Check if the error message indicates OTP expiration
             if (error.response && error.response.data.message === 'OTP has expired') {
                 setError('Your OTP has expired. Please request a new OTP.');
-                // Redirect back to the send OTP page with the same credentials
+                
                 setTimeout(() => {
-                    navigate('/signup`'); // Pass email and password in state
-                }, 2000); // Delay for user feedback
+                    navigate('/signup`'); 
+                }, 2000); 
             } else {
                 setError('Failed to verify OTP. Please try again.');
             }

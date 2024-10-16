@@ -39,14 +39,14 @@ const Product = ({ post }) => {
       console.log("Removing product ID:", post._id); // 
       await axios.post('http://localhost:5000/api/carts/remove', { productId: post._id }, { withCredentials: true });
       dispatch(remove(post._id));
-      console.log("Removed product from cart:", post._id); 
-      toast.error("Item removed from Cart");
+      console.log("Removed product from cart:", post._id);
+      toast.success("Item removed from Cart");
     } catch (error) {
       toast.error("Error removing item from cart");
       console.error("Error:", error);
     }
   };
-  
+
 
   return (
     <div id={post._id} className="flex flex-col items-center justify-between 

@@ -64,17 +64,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 function ResetPassword() {
-    const { token } = useParams();  // Get the token from the URL
+    const { token } = useParams();  
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
 
-    // Updated regex for password validation
+  
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-    // Function to validate the password
+   
     const validatePassword = (password) => {
         if (!passwordRegex.test(password)) {
             setPasswordError(

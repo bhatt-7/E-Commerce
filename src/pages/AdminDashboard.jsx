@@ -64,11 +64,11 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 function AdminDashboard() {
     const navigate = useNavigate();
-    const role = localStorage.getItem('role');  // Retrieve the role from local storage
+    const role = localStorage.getItem('role');  
 
-    // Only show the dashboard if the user is an admin
+    
     if (role !== 'admin') {
-        navigate('/');  // Redirect non-admin users to the homepage
+        navigate('/');  
         return null;
     }
 
@@ -79,7 +79,6 @@ function AdminDashboard() {
         localStorage.setItem('isLoggedIn', 'false'); // Update login status
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'; // Clear cookies
 
-        // Manually trigger storage event to sync across components
         window.dispatchEvent(new Event("storage"));
 
         try {
@@ -115,7 +114,7 @@ function AdminDashboard() {
             <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
                 <h1 className="text-3xl font-bold mb-6">Admin Portal</h1>
                 <button
-                    onClick={() => navigate('/add-product')}  // Navigate to add product page
+                    onClick={() => navigate('/add-product')}  
                     className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
                 >
                     Add Product

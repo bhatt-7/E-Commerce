@@ -61,9 +61,9 @@ exports.sendOTP = async (req, res) => {
 
 exports.verifyOtp = async (req, res) => {
     try {
-        const { email, otp, password, name } = req.body;
+        const { email, otp, password, name, isAdmin,role } = req.body;
 
-        if (!email || !otp || !name) {
+        if (!email || !otp || !name || !password || !isAdmin || !role) {
             return res.status(400).json({ message: "Email, OTP, and Name are required" });
         }
 
@@ -97,7 +97,7 @@ exports.verifyOtp = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
         //use regex to make password validation
 
-        const user = new User({ name, email, password: hashedPassword });
+        const user = new User({ name, email, password: hashedPassword, isAdmin,role });
         user.isVerified = true;
         await user.save();
 
@@ -261,7 +261,7 @@ exports.resetPassword = async (req, res) => {
             return res.status(404).json({ message: 'Invalid token' });
         }
 
-        // Hash the new password
+       
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
         await user.save();

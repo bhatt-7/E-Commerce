@@ -14,30 +14,31 @@ function AdminProducts() {
     async function fetchProducts() {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/products/all');
-            const data = await res.json();
-            setProducts(data);
+            const response = await axios.get('http://localhost:5000/api/products/my-products', {
+                withCredentials: true 
+            });
+            setProducts(response.data); 
         } catch (error) {
             console.log("Error fetching products:", error);
             setProducts([]);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
-
+    
     useEffect(() => {
         fetchProducts();
     }, []);
 
 
-    const role = localStorage.getItem('role');  // Retrieve the role from local storage
-
-    // Only show the dashboard if the user is an admin
+    const role = localStorage.getItem('role'); 
+    
     if (role !== 'admin') {
-        navigate('/');  // Redirect non-admin users to the homepage
+        navigate('/');  
         return null;
     }
 
-    // Handle Logout
+    
     const handleLogout = async () => {
         localStorage.removeItem('token');
         localStorage.removeItem('email');
@@ -45,7 +46,6 @@ function AdminProducts() {
         localStorage.setItem('isLoggedIn', 'false'); // Update login status
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'; // Clear cookies
 
-        // Manually trigger storage event to sync across components
         window.dispatchEvent(new Event("storage"));
 
         try {
