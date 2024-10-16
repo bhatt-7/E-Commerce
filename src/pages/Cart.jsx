@@ -185,11 +185,20 @@ const Cart = () => {
     const fetchCartItems = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/carts/cart', { withCredentials: true });
+        if (response.data.message === "Cart not found") {
+          toast.error("Cart is empty");
+        }
+
         console.log("Response data:", response.data.cartItems);
         setCartItems(response.data.cartItems);
+        console.log("CartItems ki length", response.data.cartItems.length);
+        if (response.data.cartItems.length <= 0) {
+          toast.error("Cart is empty");
+          navigate("/dashboard");
+        }
       } catch (error) {
         console.error("Error fetching cart items:", error);
-        toast.error("Failed to fetch cart items");
+
       }
     };
 
@@ -243,8 +252,11 @@ const Cart = () => {
             if (verifyResponse.data.success) {
               toast.success("Payment Successful");
               setCartItems([]);
-              const response = await axios.put("http://localhost:5000/api/carts/remove-all", {}, { withCredentials: true });
+              const response = await axios.put("http://localhost:5000/api/carts/remove-all", {
+                productsInCart
+              }, { withCredentials: true });
               if (response.data.status === 200) {
+                //decrease the quantity of the product in the inventory in backend
                 navigate("/success");
               }
             } else {

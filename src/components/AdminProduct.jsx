@@ -219,7 +219,7 @@
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useState } from "react";
-import { AiOutlineClose } from "react-icons/ai"; // For the close (cross) button
+import { AiOutlineClose } from "react-icons/ai";
 
 const AdminProduct = ({ post, updateProductInList, removeProductFromList }) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -228,6 +228,7 @@ const AdminProduct = ({ post, updateProductInList, removeProductFromList }) => {
         description: post.description,
         price: post.price,
         image: post.image,
+        quantity: post.quantity,
     });
 
     const handleInputChange = (e) => {
@@ -281,6 +282,9 @@ const AdminProduct = ({ post, updateProductInList, removeProductFromList }) => {
                 <p className="w-40 text-gray-600 font-normal text-md text-left">
                     {post.description.split(" ").slice(0, 10).join(" ")}
                 </p>
+            </div>
+            <div>
+                <p className="text-yellow-600 font-semibold">Quantity:{post.quantity}</p>
             </div>
             <div className={`h-[180px] ${!isEditModalOpen ? "hover:scale-105 transition-transform duration-300 ease-in-out" : ""}`}>
                 <img src={post.image} className="h-full w-full object-cover" alt={post.title} />
@@ -346,6 +350,15 @@ const AdminProduct = ({ post, updateProductInList, removeProductFromList }) => {
                                 className="border p-2 mb-2 w-full"
                                 placeholder="Price"
                             />
+                            <input
+                                type="number"
+                                name="quantity"
+                                value={editedProduct.quantity}
+                                onChange={handleInputChange}
+                                className="border p-2 mb-2 w-full"
+                                placeholder="Quantity"
+                            />
+
                             <input
                                 type="text"
                                 name="image"

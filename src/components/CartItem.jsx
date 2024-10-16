@@ -60,10 +60,12 @@ import { MdDelete } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { remove } from "../redux/Slices/CartSlice";
 import { toast } from "react-hot-toast";
+import { useState } from "react";
 
-const CartItem = ({ item, onRemove }) => {  // Accept onRemove as a prop
+const CartItem = ({ item, onRemove }) => {
   const dispatch = useDispatch();
-  
+  const [Quantity, setQuantity] = useState(item.quantity);
+
   const removeFromCart = async () => {
     try {
       const response = await axios.delete(`http://localhost:5000/api/carts/cart/${item._id}`, {
@@ -71,7 +73,7 @@ const CartItem = ({ item, onRemove }) => {  // Accept onRemove as a prop
       });
       if (response.status === 200) {
         dispatch(remove(item.id));
-        onRemove(item._id);  // Call the onRemove callback
+        onRemove(item._id);
         toast.success("Item Removed");
       }
     } catch (error) {
@@ -88,12 +90,14 @@ const CartItem = ({ item, onRemove }) => {  // Accept onRemove as a prop
         </div>
         <div>
           <h1 className="text-gray-700 font-semibold text-lg text-left w-40 mt-1">{item?.product?.title}</h1>
-          <h1 className="text-gray-400 font-normal text-[10px]">{item?.product?.description}</h1>
+          <h1 className="text-gray-400 font-normal text-[13px]">{item?.product?.description}</h1>
+          <button onClick={() => setQuantity(Quantity + 1)}>+</button>
+          <h1 className="text-gray-800 font-bold text-[13px]">Quantity:{Quantity}</h1>
           <div>
+            <button onClick={() => setQuantity(Quantity - 1)}>-</button>
             <p className="text-yellow-600 font-semibold">₹{item?.product?.price}</p>
-            <span onClick={removeFromCart} className="text-red-500 " style={{ cursor: "pointer" , fontSize: "30px",display:"inline-block"}}>
-            <MdDelete />
-
+            <span onClick={removeFromCart} className="text-red-500 " style={{ cursor: "pointer", fontSize: "30px", display: "inline-block" }}>
+              <MdDelete />
             </span>
           </div>
         </div>

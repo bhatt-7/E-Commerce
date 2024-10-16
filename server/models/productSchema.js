@@ -21,6 +21,11 @@ const productSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
+    quantity: {
+        type: Number,
+        default: 1,
+
+    },
     isDeleted: {
         type: Boolean,
         default: false

@@ -64,6 +64,7 @@ exports.removeFromCart = async (req, res) => {
 
 exports.getCart = async (req, res) => {
     try {
+        console.log("into cart");
         const userId = req.user.id;
         const cart = await Cart.findOne({ user: userId }).populate('products.product');
         if (!cart) {
@@ -102,20 +103,31 @@ exports.deleteFromCart = async (req, res) => {
 
 exports.formatCart = async (req, res) => {
     const userId = req.user.id;
-    //delete that user's cart
-    console.log("entered Format")
-    console.log('userId:', userId);
+    const products = req.body.productsInCart;
+
+    console.log("userId and products:", userId, products);
+
     try {
-        //delete cart of that user
         const deletedCart = await Cart.findOneAndDelete({ user: userId });
         if (!deletedCart) {
             return res.status(404).json({ message: 'Cart not found' });
         }
-        res.status(200).json({ message: 'Cart deleted successfully' });
 
+        
+        await Promise.all(
+            products.map(async (product) => {
+                const updatedProduct = await Product.findOneAndUpdate(
+                    { _id: product.productId },  
+                    { $inc: { quantity: -product.quantity } },  
+                    { new: true }
+                );
+                return updatedProduct;
+            })
+        );
+
+        res.status(200).json({ message: 'Cart deleted and inventory updated successfully' });
     } catch (error) {
-        console.error('Error deleting cart:', error);
-        res.status(500).json({ message: 'Failed to delete cart', error: error.message });
+        console.error('Error deleting cart or updating inventory:', error);
+        res.status(500).json({ message: 'Failed to delete cart or update inventory', error: error.message });
     }
-
-}
+};

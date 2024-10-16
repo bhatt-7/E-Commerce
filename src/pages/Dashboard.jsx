@@ -23,7 +23,7 @@ const Dashboard = () => {
     useEffect(() => {
         fetchProducts();
     }, []);
-
+    console.log("products:", products)
     return (
         <div>
             {loading ? <Spinner /> :

@@ -50,11 +50,11 @@ const deleteProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const { title, description, price, image } = req.body;
+        const { title, description, price, image, quantity } = req.body;
 
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
-            { title, description, price, image },
+            { title, description, price, image, quantity },
             { new: true }
         );
 
@@ -85,10 +85,29 @@ const getProductsForAuthenticatedUser = async (req, res) => {
     }
 };
 
+const decreaseQuantity = async (req, res) => {
+    try {
+        console.log('entered decrease quantity')
+        const { products } = req.body;
+        console.log("products:", products);
+
+        const updatedProducts = await Product.updateMany({ _id: { $in: products } }, { $inc: { quantity: -1 } });
+        if (updatedProducts.modifiedCount === 0) {
+            return res.status(404).json({ message: 'No products found for this user' });
+        }
+
+        res.status(200).json({ message: 'Quantity decreased successfully' });
+    } catch (error) {
+        console.error("Error decreasing quantity:", error);
+        res.status(500).json({ message: 'Failed to decrease quantity', error: error.message });
+    }
+};
+
 module.exports = {
     createProduct,
     getAllProducts,
     deleteProduct,
     updateProduct,
-    getProductsForAuthenticatedUser
+    getProductsForAuthenticatedUser,
+    decreaseQuantity,
 };

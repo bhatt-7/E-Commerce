@@ -1,3 +1,4 @@
+const { miniSerializeError } = require('@reduxjs/toolkit');
 const mongoose = require('mongoose');
 
 const cartSchema = new mongoose.Schema({
@@ -12,7 +13,10 @@ const cartSchema = new mongoose.Schema({
                 ref: 'Product', required: true
             },
             quantity: {
-                type: Number, default: 1
+                type: Number,
+                default: 1,
+                required: true,
+                min: 0
             }
         }
     ]

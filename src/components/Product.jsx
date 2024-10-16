@@ -57,6 +57,13 @@ const Product = ({ post }) => {
       <div>
         <p className="w-40 text-gray-600 font-normal text-md text-left text-">{post.description.split(" ").slice(0, 10).join(" ")}</p>
       </div>
+      <div>
+          <p className="text-blue-600 font-semibold">
+            {
+              post.quantity?"Available In Stock":<b className='text-red-600'>Out of Stock</b>
+            }
+          </p>
+        </div>
       <div className="h-[180px]">
         <img src={post.image} className="h-full w-full " />
       </div>
@@ -65,6 +72,7 @@ const Product = ({ post }) => {
         <div>
           <p className="text-yellow-600 font-semibold">₹{post.price}</p>
         </div>
+        
 
         {
           cart.some((p) => p._id == post._id) ?
@@ -86,6 +94,7 @@ const Product = ({ post }) => {
             </button>)
         }
       </div>
+      
     </div>
   );
 };
