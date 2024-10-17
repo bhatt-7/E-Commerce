@@ -65,7 +65,39 @@ import { useState } from "react";
 const CartItem = ({ item, onRemove }) => {
   const dispatch = useDispatch();
   const [Quantity, setQuantity] = useState(item.quantity);
+  const updateQuantity = async (newQuantity) => {
+    console.log("newQuantity", newQuantity);
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/carts/cart/${item._id}`,
+        { quantity: newQuantity },
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        setQuantity(newQuantity);
+        toast.success("Quantity updated");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating quantity");
+    }
+  };
 
+  const incrementQuantity = () => {
+    const newQuantity = Quantity + 1;
+    // setQuantity(newQuantity);
+    updateQuantity(newQuantity);
+  };
+
+  const decrementQuantity = () => {
+    if (Quantity > 1) {
+      const newQuantity = Quantity - 1;
+      // setQuantity(newQuantity);
+      updateQuantity(newQuantity);
+    } else {
+      toast.error("Quantity cannot be less than 1");
+    }
+  };
   const removeFromCart = async () => {
     try {
       const response = await axios.delete(`http://localhost:5000/api/carts/cart/${item._id}`, {
@@ -91,10 +123,10 @@ const CartItem = ({ item, onRemove }) => {
         <div>
           <h1 className="text-gray-700 font-semibold text-lg text-left w-40 mt-1">{item?.product?.title}</h1>
           <h1 className="text-gray-400 font-normal text-[13px]">{item?.product?.description}</h1>
-          <button onClick={() => setQuantity(Quantity + 1)}>+</button>
+          <button onClick={incrementQuantity}>+</button>
           <h1 className="text-gray-800 font-bold text-[13px]">Quantity:{Quantity}</h1>
+          <button onClick={decrementQuantity}>-</button>
           <div>
-            <button onClick={() => setQuantity(Quantity - 1)}>-</button>
             <p className="text-yellow-600 font-semibold">₹{item?.product?.price}</p>
             <span onClick={removeFromCart} className="text-red-500 " style={{ cursor: "pointer", fontSize: "30px", display: "inline-block" }}>
               <MdDelete />

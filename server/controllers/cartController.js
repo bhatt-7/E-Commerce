@@ -113,12 +113,12 @@ exports.formatCart = async (req, res) => {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
-        
+
         await Promise.all(
             products.map(async (product) => {
                 const updatedProduct = await Product.findOneAndUpdate(
-                    { _id: product.productId },  
-                    { $inc: { quantity: -product.quantity } },  
+                    { _id: product.productId },
+                    { $inc: { quantity: -product.quantity } },
                     { new: true }
                 );
                 return updatedProduct;
@@ -129,5 +129,60 @@ exports.formatCart = async (req, res) => {
     } catch (error) {
         console.error('Error deleting cart or updating inventory:', error);
         res.status(500).json({ message: 'Failed to delete cart or update inventory', error: error.message });
+    }
+};
+
+exports.handleQuantity = async (req, res) => {
+    const productId = req.params.productId;
+    const { quantity } = req.body;
+    const userId = req.user.id;
+
+    console.log("userId:", userId);
+    console.log("productId:", productId);
+    console.log("Quantity:", quantity);
+
+    if (!productId || !quantity) {
+        return res.status(400).json({ message: 'Product ID and quantity are required' });
+    }
+
+    if (quantity <= 0) {
+        return res.status(400).json({ message: 'Quantity must be greater than 0' });
+    }
+
+    try {
+        const cart = await Cart.findOne({ user: userId });
+        console.log("Existing Cart:", cart);
+
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found for the user' });
+        }
+
+        console.log("Existing Cart products:", cart.products);
+        const productInCart = cart.products.find(p => p._id.toString() === productId);
+        console.log("Product in Cart:", productInCart);
+
+        if (!productInCart) {
+            return res.status(404).json({ message: 'Product not found in cart' });
+        }
+        productInCart.quantity = quantity;
+
+        await cart.save();
+
+
+        // const cart = await Cart.findOneAndUpdate(
+        //     { user: userId, 'products.product': productId },
+        //     { $set: { 'products.$.quantity': quantity } },
+        //     { new: true }
+        // );
+
+        console.log("Cart:", cart);
+
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart item not found' });
+        }
+        res.status(200).json({ message: 'Cart item quantity updated successfully' }, cart);
+    } catch (error) {
+        console.error('Error updating cart item quantity:', error);
+        res.status(500).json({ message: 'Failed to update cart item quantity', error: error.message });
     }
 };
