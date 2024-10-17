@@ -180,9 +180,9 @@ exports.handleQuantity = async (req, res) => {
         if (!cart) {
             return res.status(404).json({ message: 'Cart item not found' });
         }
-        res.status(200).json({ message: 'Cart item quantity updated successfully' }, cart);
+        res.status(200).json({ message: 'Cart item quantity updated successfully', cart: cart });
     } catch (error) {
         console.error('Error updating cart item quantity:', error);
-        res.status(500).json({ message: 'Failed to update cart item quantity', error: error.message });
+        res.status(501).json({ message: 'Failed to update cart item quantity', error: error.message });
     }
 };
