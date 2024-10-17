@@ -152,7 +152,6 @@ exports.handleQuantity = async (req, res) => {
     try {
         const cart = await Cart.findOne({ user: userId });
         console.log("Existing Cart:", cart);
-
         if (!cart) {
             return res.status(404).json({ message: 'Cart not found for the user' });
         }
@@ -164,6 +163,23 @@ exports.handleQuantity = async (req, res) => {
         if (!productInCart) {
             return res.status(404).json({ message: 'Product not found in cart' });
         }
+        const actualProductId = productInCart.product;
+        console.log("actualProductId", actualProductId);
+        if (!actualProductId) {
+            return res.status(404).json({ message: 'Product not found in database' });
+        }
+
+        const actualProduct = await Product.findById(actualProductId);
+        console.log("actualProduct", actualProduct)
+        const actualProductQuantity = actualProduct.quantity;
+        console.log("actualProductQuantity", actualProductQuantity)
+
+
+        if (quantity > actualProductQuantity) {
+            return res.status(400).json({ message: 'Quantity exceeds available stock' });
+        }
+
+
         productInCart.quantity = quantity;
 
         await cart.save();
@@ -175,7 +191,7 @@ exports.handleQuantity = async (req, res) => {
         //     { new: true }
         // );
 
-        console.log("Cart:", cart);
+        console.log("Updated Cart:", cart);
 
         if (!cart) {
             return res.status(404).json({ message: 'Cart item not found' });

@@ -62,26 +62,9 @@ import { remove } from "../redux/Slices/CartSlice";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 
-const CartItem = ({ item, onRemove }) => {
+const CartItem = ({ item, onRemove, onUpdateQuantity }) => {
   const dispatch = useDispatch();
   const [Quantity, setQuantity] = useState(item.quantity);
-  const updateQuantity = async (newQuantity) => {
-    console.log("newQuantity", newQuantity);
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/api/carts/cart/${item._id}`,
-        { quantity: newQuantity },
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        setQuantity(newQuantity);
-        toast.success("Quantity updated");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Error updating quantity");
-    }
-  };
 
   const incrementQuantity = () => {
     const newQuantity = Quantity + 1;
@@ -98,13 +81,15 @@ const CartItem = ({ item, onRemove }) => {
       toast.error("Quantity cannot be less than 1");
     }
   };
+
+
   const removeFromCart = async () => {
     try {
       const response = await axios.delete(`http://localhost:5000/api/carts/cart/${item._id}`, {
         withCredentials: true
       });
       if (response.status === 200) {
-        dispatch(remove(item.id));
+        dispatch(remove(item._id));
         onRemove(item._id);
         toast.success("Item Removed");
       }
@@ -113,6 +98,30 @@ const CartItem = ({ item, onRemove }) => {
       toast.error("Error removing item from cart");
     }
   };
+
+  const updateQuantity = async (newQuantity) => {
+    console.log("newQuantity", newQuantity);
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/carts/cart/${item._id}`,
+        { quantity: newQuantity },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        console.log("response after updating quantity", response);
+        setQuantity(newQuantity);
+        onUpdateQuantity(item._id, newQuantity);
+        toast.success("Quantity updated");
+      }
+    } catch (error) {
+      console.error(error);
+      console.log(error.message);
+      toast.error("Error updating Cart");
+    }
+
+  };
+
 
   return (
     <div className="flex justify-center content-center">

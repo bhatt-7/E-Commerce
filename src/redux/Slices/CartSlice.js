@@ -25,6 +25,7 @@ export const CartSlice = createSlice({
     initialState: [],
     reducers: {
         add: (state, action) => {
+            console.log(action.payload);
             state.push(action.payload);
         },
         remove: (state, action) => {

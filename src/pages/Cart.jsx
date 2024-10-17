@@ -206,7 +206,10 @@ const Cart = () => {
   }, []);
 
   useEffect(() => {
-    setTotalAmount(cartItems.reduce((acc, curr) => acc + (curr.product?.price || 0), 0));
+    const total = cartItems.reduce((acc, curr) => {
+      return acc + (curr.product?.price || 0) * (curr.quantity || 1);
+    }, 0);
+    setTotalAmount(total);
   }, [cartItems]);
 
   useEffect(() => {
@@ -227,12 +230,13 @@ const Cart = () => {
         quantity: item.quantity,
       }));
 
-      const { data: { orderId, order } } = await axios.post('http://localhost:5000/api/payments/create-order', {
+      const response = await axios.post('http://localhost:5000/api/payments/create-order', {
         amount: totalAmount,
         currency: "INR",
         products: productsInCart
       }, { withCredentials: true });
 
+      const { orderId, order } = response.data;
       const options = {
         key: "rzp_test_5XhKGpSXFOwnLs",
         amount: order.amount,
@@ -269,7 +273,7 @@ const Cart = () => {
         prefill: {
           name: "Ayush",
           email: "ayushbhatt@gmail.com",
-          contact: "9999999990",
+          contact: "8950225338",
         },
         theme: {
           color: "#528FF0",
@@ -283,6 +287,13 @@ const Cart = () => {
     }
   };
 
+  const handleUpdateQuantity = (id, newQuantity) => {
+    setCartItems((prevItems) => {
+      return prevItems.map((item) =>
+        item._id === id ? { ...item, quantity: newQuantity } : item
+      );
+    });
+  };
 
   return (
     <div className="flex justify-center content-center">
@@ -290,7 +301,7 @@ const Cart = () => {
         <div className="flex flex-col-reverse sm:flex-row justify-center content-center m-3 gap-10">
           <div>
             {cartItems.map((item) => (
-              <CartItem key={item._id} item={item} onRemove={handleRemoveItem} />
+              <CartItem key={item._id} item={item} onRemove={handleRemoveItem} onUpdateQuantity={handleUpdateQuantity} />
             ))}
           </div>
 

@@ -61,7 +61,7 @@ exports.sendOTP = async (req, res) => {
 
 exports.verifyOtp = async (req, res) => {
     try {
-        const { email, otp, password, name, isAdmin,role } = req.body;
+        const { email, otp, password, name, isAdmin, role } = req.body;
 
         if (!email || !otp || !name || !password || !isAdmin || !role) {
             return res.status(400).json({ message: "Email, OTP, and Name are required" });
@@ -97,7 +97,7 @@ exports.verifyOtp = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
         //use regex to make password validation
 
-        const user = new User({ name, email, password: hashedPassword, isAdmin,role });
+        const user = new User({ name, email, password: hashedPassword, isAdmin, role });
         user.isVerified = true;
         await user.save();
 
@@ -181,7 +181,7 @@ exports.login = async (req, res) => {
             id: user._id,
             email: user.email,
             name: user.name,
-            role: user.role  // Ensure role is saved in the user schema
+            role: user.role
         };
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -261,7 +261,7 @@ exports.resetPassword = async (req, res) => {
             return res.status(404).json({ message: 'Invalid token' });
         }
 
-       
+
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
         await user.save();
