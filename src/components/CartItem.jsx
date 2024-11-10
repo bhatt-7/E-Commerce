@@ -62,7 +62,7 @@ import { remove } from "../redux/Slices/CartSlice";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 
-const CartItem = ({ item, onRemove, onUpdateQuantity }) => {
+const CartItem = ({ item, onRemove, onUpdateQuantity, isInCart }) => {
   const dispatch = useDispatch();
   const [Quantity, setQuantity] = useState(item.quantity);
 

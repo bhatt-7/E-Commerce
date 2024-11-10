@@ -42,7 +42,7 @@ exports.sendOTP = async (req, res) => {
         // Store OTP and its expiration time
         const expirationTime = Date.now() + OTP_EXPIRATION_TIME;
         otpStore.set(email, { otp, expirationTime });
-
+        console.log(otpStore);
         const mailOptions = {
             from: 'your-email@gmail.com',
             to: email,
@@ -62,17 +62,18 @@ exports.sendOTP = async (req, res) => {
 exports.verifyOtp = async (req, res) => {
     try {
         const { email, otp, password, name, isAdmin, role } = req.body;
-
-        if (!email || !otp || !name || !password || !isAdmin || !role) {
-            return res.status(400).json({ message: "Email, OTP, and Name are required" });
-        }
-
+        console.log(req.body)
+        
+        // if (!email || !otp || !name || !password || !isAdmin || !role) {
+        //     return res.status(400).json({ message: "Email, OTP, and Name are required" });
+        // }
+        
         const otpData = otpStore.get(email);
+        console.log(otpData);
         if (!otpData) {
             return res.status(400).json({ message: "OTP not found or expired" });
         }
 
-        // Check if the OTP is expired
         const { otp: storedOtp, expirationTime } = otpData;
         if (Date.now() > expirationTime) {
             otpStore.delete(email); // Remove expired OTP
@@ -105,6 +106,7 @@ exports.verifyOtp = async (req, res) => {
 
         return res.status(200).json({ message: "User created successfully", user });
     } catch (error) {
+        console.log(error);
         console.error("Error verifying OTP:", error);
         return res.status(500).json({ message: "Error verifying OTP", error: error.message });
     }

@@ -32,7 +32,11 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'processing', 'shipped', 'delivered'],
         default: 'pending'
-    }
+    },
+    orderId: {
+        type: String,
+        required: true
+    },
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);

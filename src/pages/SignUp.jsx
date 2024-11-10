@@ -151,7 +151,7 @@ function SignUp() {
 
         setFormData({
             ...formData,
-            [name]: type === 'checkbox' ? checked : value ,
+            [name]: type === 'checkbox' ? checked : value,
 
         });
     };
@@ -166,7 +166,7 @@ function SignUp() {
             return;
         }
 
-     
+
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
             return;
@@ -177,7 +177,6 @@ function SignUp() {
         try {
             localStorage.setItem('userData', JSON.stringify(formData));
 
-           
             const response = await axios.post('http://localhost:5000/api/users/send-otp', { email: formData.email });
 
             if (response.status === 200) {

@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/carts', cartRoutes)
-app.use('/api/payments',paymentRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/', (req, res) => {
     res.send("Hello World");

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const Product = require('../models/productSchema');
 const Order = require('../models/orderSchema');
 const Payment = require('../models/paymentSchema');
 const { authenticateToken } = require('../middlewares/auth');
@@ -29,8 +30,16 @@ router.post('/create-order', authenticateToken, async (req, res) => {
         } 
         console.log("parsedProducts:", parsedProducts);
 
-        const order = await razorpay.orders.create(options);
+        for (let product of parsedProducts) {
+            const productData = await Product.findById(product.productId);
+            if(productData.isDeleted) {
+                console.log(`${productData.title} is deleted`);
+                return res.status(404).json({ success: false, message: `${productData.title} out of Stock` });
+            }
+        }
 
+        const order = await razorpay.orders.create(options);
+        console.log("order:", order);
         if (!order) {
             return res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
         }
@@ -45,11 +54,12 @@ router.post('/create-order', authenticateToken, async (req, res) => {
             products: formattedProducts,
             totalAmount: amount,
             paymentStatus: 'pending',
+            orderId: order.id
         });
-
+       
         await newOrder.save();
 
-        res.status(201).json({ success: true, orderId: newOrder._id, order }); // Pass orderId
+        res.status(201).json({ success: true, orderId: newOrder._id, order }); 
     } catch (error) {
         console.error('Error creating Razorpay order:', error);
         res.status(500).json({ success: false, message: 'Error creating order' });
@@ -58,10 +68,10 @@ router.post('/create-order', authenticateToken, async (req, res) => {
 
 router.post('/verify-payment', async (req, res) => { 
     try {
-        const { order_id, payment_id, signature } = req.body; // Use correct parameter names
+        const { order_id, payment_id, signature } = req.body; 
 
         const order = await Order.findById(order_id);
-
+        console.log("order while verifying payment:", order);
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
@@ -70,7 +80,7 @@ router.post('/verify-payment', async (req, res) => {
             user: order.user,
             order: order._id,
             paymentId: payment_id,
-            orderId: order_id,
+            orderId: order.orderId,
             signature,
             amount: order.totalAmount
         });

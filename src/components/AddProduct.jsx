@@ -39,8 +39,6 @@ const AddProduct = () => {
         } catch (error) {
 
         }
-
-
     };
 
     const handleLogout = async () => {

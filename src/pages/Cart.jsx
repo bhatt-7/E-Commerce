@@ -236,6 +236,12 @@ const Cart = () => {
         products: productsInCart
       }, { withCredentials: true });
 
+      console.log("Response data:", response.data);
+
+      if (response.data.message === "Cart not found") {
+        toast.error("Cart is empty");
+      }
+
       const { orderId, order } = response.data;
       const options = {
         key: "rzp_test_5XhKGpSXFOwnLs",
@@ -283,7 +289,13 @@ const Cart = () => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
-      toast.error("Error during checkout");
+      console.log(error);
+      if (error.status === 404) {
+        toast.error(error.response.data.message);
+      } else {
+
+        toast.error("Error during checkout");
+      }
     }
   };
 
@@ -301,7 +313,12 @@ const Cart = () => {
         <div className="flex flex-col-reverse sm:flex-row justify-center content-center m-3 gap-10">
           <div>
             {cartItems.map((item) => (
-              <CartItem key={item._id} item={item} onRemove={handleRemoveItem} onUpdateQuantity={handleUpdateQuantity} />
+              <CartItem
+                key={item._id}
+                item={item}
+                onRemove={handleRemoveItem}
+                onUpdateQuantity={handleUpdateQuantity}
+              />
             ))}
           </div>
 

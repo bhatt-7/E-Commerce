@@ -30,6 +30,28 @@ const getAllProducts = async (req, res) => {
         console.error("Error fetching products:", error);
         res.status(500).json({ message: 'Failed to fetch products', error: error.message });
     }
+
+    //Lazy loading
+
+    // const page = parseInt(req.query.page) || 1;  // Page number from query
+    // const limit = parseInt(req.query.limit) || 10;  // Limit per page
+
+    // try {
+    //     const startIndex = (page - 1) * limit;   // Calculate offset
+    //     const products = await Product.find().skip(startIndex).limit(limit);  // Fetch products
+
+    //     const totalProducts = await Product.countDocuments();  // Total product count
+
+    //     res.json({
+    //         total: totalProducts,
+    //         page,
+    //         limit,
+    //         products
+    //     });
+    // } catch (error) {
+    //     console.error("Error fetching products:", error);
+    //     res.status(500).json({ message: "Server error" });
+    // }
 };
 const deleteProduct = async (req, res) => {
     const { id } = req.params;

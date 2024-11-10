@@ -30,6 +30,7 @@ function VerifyOtp() {
 
             const { email, password, name, isAdmin } = userData;
             const role = isAdmin ? 'admin' : 'user';
+            console.log(email, password, name, isAdmin, role);
             const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
                 email,
                 otp,
@@ -43,18 +44,18 @@ function VerifyOtp() {
                 setSuccess('OTP verified successfully! User registered.');
                 localStorage.removeItem('userData');
                 setTimeout(() => {
-                    navigate('/login'); 
-                }, 2000); 
+                    navigate('/login');
+                }, 2000);
             } else {
                 setError('Invalid OTP or request failed');
             }
         } catch (error) {
             if (error.response && error.response.data.message === 'OTP has expired') {
                 setError('Your OTP has expired. Please request a new OTP.');
-                
+
                 setTimeout(() => {
-                    navigate('/signup`'); 
-                }, 2000); 
+                    navigate('/signup`');
+                }, 2000);
             } else {
                 setError('Failed to verify OTP. Please try again.');
             }
