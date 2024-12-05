@@ -5,6 +5,8 @@ const User = require('../models/userSchema');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
+const Product = require('../models/productSchema');
+const Order = require('../models/orderSchema');
 
 
 const JWT_SECRET = 'hello123';
@@ -272,5 +274,44 @@ exports.resetPassword = async (req, res) => {
         res.status(200).json({ message: 'Password reset successful' });
     } catch (error) {
         res.status(500).json({ message: 'Error resetting password' });
+    }
+};
+
+exports.prevOrders = async (req, res) => {
+    try {
+        // Find the user by ID from the authenticated request
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Fetch all orders for the user and populate product details
+        const orderDetails = await Order.find({ user: user._id }).populate({
+            path: "products.product",
+            model: "Product",
+            select: "title description price image",
+        });
+
+        // Format the response to send to the frontend
+        const formattedOrders = orderDetails.map(order => ({
+            orderId: order.orderId,
+            orderStatus: order.orderStatus,
+            paymentStatus: order.paymentStatus,
+            totalAmount: order.totalAmount,
+            products: order.products.map(product => ({
+                title: product.product.title,
+                description: product.product.description,
+                price: product.product.price,
+                image: product.product.image,
+                quantity: product.quantity,
+            })),
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+        }));
+
+        res.status(200).json(formattedOrders);
+    } catch (error) {
+        console.error("Error retrieving orders:", error);
+        res.status(500).json({ message: "Error retrieving orders", error: error.message });
     }
 };

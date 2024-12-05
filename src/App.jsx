@@ -13,6 +13,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AdminProducts from "./pages/AdminProducts";
+import Orders from "./pages/Orders";
 const App = () => {
 
   const location = useLocation();
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path='/admin/products' element={<AdminProducts />} />
+        <Route path="/orders" element={<Orders/>}/>
       </Routes>
     </div>
   )

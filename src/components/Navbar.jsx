@@ -200,6 +200,7 @@ const Navbar = () => {
             Logout
           </button>
         )}
+        <button onClick={() => navigate('/orders')}>My Orders</button>
       </div>
     </nav>
   );

@@ -64,11 +64,10 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 function AdminDashboard() {
     const navigate = useNavigate();
-    const role = localStorage.getItem('role');  
+    const role = localStorage.getItem('role');
 
-    
     if (role !== 'admin') {
-        navigate('/');  
+        navigate('/');
         return null;
     }
 
@@ -114,7 +113,7 @@ function AdminDashboard() {
             <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
                 <h1 className="text-3xl font-bold mb-6">Admin Portal</h1>
                 <button
-                    onClick={() => navigate('/add-product')}  
+                    onClick={() => navigate('/add-product')}
                     className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
                 >
                     Add Product
