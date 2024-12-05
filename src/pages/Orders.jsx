@@ -40,7 +40,7 @@ const Orders = () => {
                             <h2 className="text-xl font-semibold text-gray-800">Order ID: {order.orderId}</h2>
                             <p className="text-gray-600">Order Status: <span className="font-medium">{order.orderStatus}</span></p>
                             <p className="text-gray-600">Payment Status: <span className="font-medium">{order.paymentStatus}</span></p>
-                            <p className="text-gray-600">Total Amount: <span className="font-medium">${order.totalAmount}</span></p>
+                            <p className="text-gray-600">Total Amount: <span className="font-medium">₹{order.totalAmount}</span></p>
                             <h3 className="text-lg font-semibold text-gray-700 mt-4">Products:</h3>
                             <div className="mt-2 space-y-4">
                                 {order.products.map(product => (
@@ -61,7 +61,7 @@ const Orders = () => {
                                                 Quantity: <span className="font-medium">{product.quantity}</span>
                                             </p>
                                             <p className="text-sm text-gray-500">
-                                                Price: <span className="font-medium">${product.price}</span>
+                                                Price: <span className="font-medium">₹{product.price}</span>
                                             </p>
                                         </div>
                                     </div>
