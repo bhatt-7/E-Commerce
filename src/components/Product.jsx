@@ -180,21 +180,13 @@ const Product = ({ post }) => {
           <p className="text-yellow-600 font-semibold">₹{post.price}</p>
         </div>
         {
-          isInCart ? (
-            <button
-              className="text-green-700 font-semibold text-[14px] p-1 px-3 uppercase disabled"
-            >
-              Item Already in Cart
-            </button>
-          ) : (
-            post.quantity > 0 &&
-            <button
-              className="text-gray-700 border-2 border-gray-700 rounded-full font-semibold text-[12px] p-1 px-3 uppercase hover:bg-gray-700 hover:text-white transition duration-300 ease-in"
-              onClick={addToCart}
-            >
-              Add to Cart
-            </button>
-          )
+          post.quantity > 0 &&
+          <button
+            className="text-gray-700 border-2 border-gray-700 rounded-full font-semibold text-[12px] p-1 px-3 uppercase hover:bg-gray-700 hover:text-white transition duration-300 ease-in"
+            onClick={addToCart}
+          >
+            Add to Cart
+          </button>
         }
       </div>
     </div>

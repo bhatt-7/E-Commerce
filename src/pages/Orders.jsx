@@ -41,6 +41,7 @@ const Orders = () => {
                             <p className="text-gray-600">Order Status: <span className="font-medium">{order.orderStatus}</span></p>
                             <p className="text-gray-600">Payment Status: <span className="font-medium">{order.paymentStatus}</span></p>
                             <p className="text-gray-600">Total Amount: <span className="font-medium">₹{order.totalAmount}</span></p>
+                            <p className='text-gray-600'>Order Date: {new Date(order.createdAt).toLocaleString()}</p>
                             <h3 className="text-lg font-semibold text-gray-700 mt-4">Products:</h3>
                             <div className="mt-2 space-y-4">
                                 {order.products.map(product => (
@@ -48,7 +49,6 @@ const Orders = () => {
                                         key={product.title}
                                         className="flex items-center gap-4 p-4 border rounded-lg bg-gray-50"
                                     >
-                                        {/* Uncomment below if image URLs are functional */}
                                         <img
                                             src={product.image}
                                             alt={product.title}
