@@ -65,11 +65,11 @@ exports.verifyOtp = async (req, res) => {
     try {
         const { email, otp, password, name, isAdmin, role } = req.body;
         console.log(req.body)
-        
+
         // if (!email || !otp || !name || !password || !isAdmin || !role) {
         //     return res.status(400).json({ message: "Email, OTP, and Name are required" });
         // }
-        
+
         const otpData = otpStore.get(email);
         console.log(otpData);
         if (!otpData) {
@@ -114,54 +114,6 @@ exports.verifyOtp = async (req, res) => {
     }
 };
 
-// exports.login = async (req, res) => {
-//     console.log("req.body", req.body);
-//     try {
-//         const { email, password } = req.body;
-
-//         if (!email || !password) {
-//             return res.status(400).json({ message: "Email and password are required" });
-//         }
-
-//         // Find the user by email
-//         const user = await User.findOne({ email });
-//         console.log(user);
-//         if (!user) {
-//             return res.status(400).json({ message: "User not found" });
-//         }
-
-//         // Check if the password matches
-//         const isMatch = await bcrypt.compare(password, user.password);
-//         if (!isMatch) {
-//             return res.status(400).json({ message: "Invalid credentials" });
-//         }
-
-//         // Create a payload with user data (you can include more fields if needed)
-//         const payload = {
-//             id: user._id,
-//             email: user.email,
-//             name: user.name // Assuming the user schema has a name field
-//         };
-
-//         // Generate a JWT token
-//         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-//         //set token in cookie
-//         res.cookie('token', token, {
-//             httpOnly: true,
-//             sameSite: 'None',
-//             secure: true,
-//             maxAge: 2 * 60 * 60 * 1000
-//         })
-
-//         res.status(200).json({ message: "Login successful", token });
-
-
-//     } catch (error) {
-//         console.error("Error logging in:", error);
-//         return res.status(500).json({ message: "Error logging in", error: error.message });
-//     }
-// };
-
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -180,7 +132,6 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        // Add the user's role to the JWT payload
         const payload = {
             id: user._id,
             email: user.email,
@@ -223,10 +174,8 @@ exports.forgotPassword = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Generate a reset token
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Create a transporter
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -235,7 +184,6 @@ exports.forgotPassword = async (req, res) => {
             },
         });
 
-        // Send email with reset link
         const resetLink = `http://localhost:3000/reset-password/${token}`;
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
@@ -279,20 +227,17 @@ exports.resetPassword = async (req, res) => {
 
 exports.prevOrders = async (req, res) => {
     try {
-        // Find the user by ID from the authenticated request
         const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Fetch all orders for the user and populate product details
         const orderDetails = await Order.find({ user: user._id }).populate({
             path: "products.product",
             model: "Product",
             select: "title description price image",
         });
 
-        // Format the response to send to the frontend
         const formattedOrders = orderDetails.map(order => ({
             orderId: order.orderId,
             orderStatus: order.orderStatus,

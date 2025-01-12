@@ -131,7 +131,7 @@ function Login() {
 
                 localStorage.setItem('token', token);
                 localStorage.setItem('email', email);
-                localStorage.setItem('role', role);  // Save the role in local storage
+                localStorage.setItem('role', role);  
                 localStorage.setItem('isLoggedIn', 'true');
                 window.dispatchEvent(new Event("storage"));
 

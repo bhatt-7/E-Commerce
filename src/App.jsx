@@ -1,6 +1,6 @@
 import { Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar"
-import { Route,useNavigate } from "react-router-dom";
+import { Route, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Home from "./pages/Home"
 import Cart from "./pages/Cart"
@@ -19,21 +19,12 @@ const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-    
-  //   const userRole = localStorage.getItem("role"); 
-  //   if (userRole === "admin") {
-      
-  //     navigate("/admin-dashboard");
-  //   }
-    
-  // }, []);
-
   return (
     <div >
-      {/* Apply inline style to hide Navbar if route is '/admin-dashboard' */}
-      <div className="bg-black" style={{ display: location.pathname === '/admin-dashboard'|| location.pathname === '/admin/products' ||
-        location.pathname === '/add-product' ? 'none' : 'block' }}>
+      <div className="bg-black" style={{
+        display: location.pathname === '/admin-dashboard' || location.pathname === '/admin/products' ||
+          location.pathname === '/add-product' ? 'none' : 'block'
+      }}>
         <Navbar />
       </div>
 
@@ -49,7 +40,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path='/admin/products' element={<AdminProducts />} />
-        <Route path="/orders" element={<Orders/>}/>
+        <Route path="/orders" element={<Orders />} />
       </Routes>
     </div>
   )
