@@ -20,29 +20,25 @@ function VerifyOtp() {
         setLoading(true);
 
         try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            console.log("User data:", userData);
-            if (!userData) {
+            const Email = JSON.parse(localStorage.getItem('Email'));
+            console.log("Email in local storage:", Email,otp);
+            if (!Email) {
                 setError('No user data found. Please register again.');
                 setLoading(false);
                 return;
             }
 
-            const { email, password, name, isAdmin } = userData;
-            const role = isAdmin ? 'admin' : 'user';
-            console.log(email, password, name, isAdmin, role);
+            // const { email, password, name, isAdmin } = userData;
+            // const role = isAdmin ? 'admin' : 'user';
+            // console.log(email, password, name, isAdmin, role);
             const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
-                email,
-                otp,
-                password,
-                name,
-                isAdmin,
-                role
+                Email,
+                otp
             });
 
             if (response.status === 200) {
                 setSuccess('OTP verified successfully! User registered.');
-                localStorage.removeItem('userData');
+                localStorage.removeItem('Email');
                 setTimeout(() => {
                     navigate('/login');
                 }, 2000);

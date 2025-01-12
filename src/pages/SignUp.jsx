@@ -129,7 +129,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 
 function SignUp() {
     const navigate = useNavigate();
@@ -156,7 +156,6 @@ function SignUp() {
         });
     };
     console.log(formData);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -166,7 +165,6 @@ function SignUp() {
             return;
         }
 
-
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
             return;
@@ -175,9 +173,18 @@ function SignUp() {
         setLoading(true);
 
         try {
-            localStorage.setItem('userData', JSON.stringify(formData));
+            localStorage.setItem('Email', JSON.stringify(formData.email));
 
-            const response = await axios.post('http://localhost:5000/api/users/send-otp', { email: formData.email });
+            const response = await axios.post('http://localhost:5000/api/users/send-otp', {
+                formData: {
+                    email: formData.email,
+                    name: formData.name,
+                    password: formData.password,
+                    confirmPassword: formData.confirmPassword,
+                    isAdmin: formData.isAdmin,
+                }
+            });
+
 
             if (response.status === 200) {
                 alert('OTP sent to your email!');
@@ -191,6 +198,7 @@ function SignUp() {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="flex justify-center items-center h-screen bg-gray-100">

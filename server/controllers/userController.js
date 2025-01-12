@@ -25,12 +25,15 @@ const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const OTP_EXPIRATION_TIME = 2 * 60 * 1000; // 2 minutes in milliseconds
-
+const OTP_EXPIRATION_TIME = 2*60 * 1000;
 exports.sendOTP = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { formData } = req.body;
+        console.log(formData)
+        const { name, email, password, isAdmin } = formData;
+        const role = isAdmin ? 'admin' : 'user';
         const user = await User.findOne({ email });
+        console.log(user);
         if (user) {
             return res.status(400).json({ message: "User already exists" });
         }
@@ -40,13 +43,24 @@ exports.sendOTP = async (req, res) => {
 
         const otp = generateOTP();
         console.log(otp);
-
-        // Store OTP and its expiration time
+        const hashedPassword = await bcrypt.hash(password, 10);
         const expirationTime = Date.now() + OTP_EXPIRATION_TIME;
-        otpStore.set(email, { otp, expirationTime });
-        console.log(otpStore);
+
+        const newUser = new User({
+            name,
+            email,
+            password:hashedPassword,
+            isAdmin,
+            otp,
+            isVerified: false,
+            otpExpiration: expirationTime,
+            role,
+        });
+
+        await newUser.save();
+
         const mailOptions = {
-            from: 'your-email@gmail.com',
+            from: process.env.EMAIL_USER,
             to: email,
             subject: 'Your OTP Code',
             text: `Your OTP code is ${otp}. It will expire in 2 minutes.`,
@@ -61,58 +75,43 @@ exports.sendOTP = async (req, res) => {
     }
 };
 
+
 exports.verifyOtp = async (req, res) => {
     try {
-        const { email, otp, password, name, isAdmin, role } = req.body;
-        console.log(req.body)
-
-        // if (!email || !otp || !name || !password || !isAdmin || !role) {
-        //     return res.status(400).json({ message: "Email, OTP, and Name are required" });
-        // }
-
-        const otpData = otpStore.get(email);
-        console.log(otpData);
-        if (!otpData) {
-            return res.status(400).json({ message: "OTP not found or expired" });
+        const { Email, otp } = req.body;
+        console.log(Email, otp);
+        if (!Email || !otp) {
+            return res.status(400).json({ message: 'Email and OTP are required.' });
         }
 
-        const { otp: storedOtp, expirationTime } = otpData;
-        if (Date.now() > expirationTime) {
-            otpStore.delete(email); // Remove expired OTP
-            return res.status(400).json({ message: "OTP has expired" });
+        const user = await User.findOne({email:Email });
+        console.log('ye raha user:',user);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
         }
-
-        if (storedOtp !== otp) {
-            return res.status(400).json({ message: "Invalid OTP" });
+        console.log('before verifying otp');
+        if (user.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP.' });
         }
+        console.log('after verifying otp');
 
-        if (!password) {
-            return res.status(400).json({ message: "Password is required" });
+        if (Date.now() > user.otpExpiration) {
+            return res.status(400).json({ message: 'OTP has expired.' });
         }
-
-        if (!passwordRegex.test(password)) {
-            return res.status(400).json({
-                message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
-            });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        //use regex to make password validation
-
-        const user = new User({ name, email, password: hashedPassword, isAdmin, role });
+        console.log('before saving user');
+        console.log(user);
         user.isVerified = true;
+        user.otp = undefined;
+        user.otpExpiration = undefined;
         await user.save();
-
-        otpStore.delete(email);
-
-        return res.status(200).json({ message: "User created successfully", user });
+        console.log('user saved successfully');
+        return res.status(200).json({ message: 'OTP verified successfully. User is now registered.' });
     } catch (error) {
-        console.log(error);
         console.error("Error verifying OTP:", error);
-        return res.status(500).json({ message: "Error verifying OTP", error: error.message });
+        return res.status(500).json({ message: 'Failed to verify OTP. Please try again.' });
     }
 };
+
 
 exports.login = async (req, res) => {
     try {
