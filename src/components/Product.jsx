@@ -168,7 +168,11 @@ const Product = ({ post }) => {
       </div>
       <div>
         <p className="text-blue-600 font-semibold">
-          {post.quantity ? "Available In Stock" : <b className='text-red-600'>Out of Stock</b>}
+          {/* {post.quantity ? "Available In Stock" : <b className='text-red-600'>Out of Stock</b>} */}
+          {
+            post.quantity < 5 && post.quantity > 0 ? <b className="text-orange-300">Only a few left</b> : post.quantity > 5 ? "Available In Stock" : <b className='text-red-600'>Out of Stock</b>
+
+          }
         </p>
       </div>
       <div className="h-[180px]">
